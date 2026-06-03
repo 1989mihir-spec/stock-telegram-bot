@@ -66,6 +66,7 @@ async def scan():
             print(stock, e)
 
 async def main():
+    await send_message("✅ Stock bot started successfully")
     while True:
         try:
             if market_open():
