@@ -1,6 +1,7 @@
 import os
 import asyncio
 from datetime import datetime
+
 import yfinance as yf
 from ta.momentum import RSIIndicator
 from telegram import Bot
@@ -21,7 +22,6 @@ WATCHLIST = [
 "JIOFIN.NS",
 "EQUITASBNK.NS"
 ]
-
 
 def market_open():
 now = datetime.now()
@@ -70,7 +70,7 @@ auto_adjust=True
 
         if today_volume > avg_volume * 2:
             await send_message(
-                f"🚀 VOLUME BREAKOUT\n{stock}\nVolume {today_volume/avg_volume:.1f}x Average"
+                f"🚀 VOLUME BREAKOUT\n{stock}\nVolume {today_volume / avg_volume:.1f}x Average"
             )
 
         if rsi < 30:
