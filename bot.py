@@ -12,15 +12,15 @@ CHAT_ID = os.getenv("CHAT_ID")
 bot = Bot(token=BOT_TOKEN)
 
 WATCHLIST = [
-"RELIANCE.NS",
-"TCS.NS",
-"HDFCBANK.NS",
-"SBIN.NS",
-"BEL.NS",
-"TATAPOWER.NS",
-"TATASTEEL.NS",
-"JIOFIN.NS",
-"EQUITASBNK.NS"
+    "RELIANCE.NS",
+    "TCS.NS",
+    "HDFCBANK.NS",
+    "SBIN.NS",
+    "BEL.NS",
+    "TATAPOWER.NS",
+    "TATASTEEL.NS",
+    "JIOFIN.NS",
+    "EQUITASBNK.NS"
 ]
 
 def market_open():
@@ -29,77 +29,79 @@ def market_open():
     if now.weekday() > 4:
         return False
 
-current = now.hour * 60 + now.minute
-return 555 <= current <= 930
+    current = now.hour * 60 + now.minute
+    return 555 <= current <= 930
+
 
 async def send_message(msg):
-await bot.send_message(
-chat_id=CHAT_ID,
-text=msg
-)
+    await bot.send_message(
+        chat_id=CHAT_ID,
+        text=msg
+    )
+
 
 async def scan():
-for stock in WATCHLIST:
-try:
-df = yf.download(
-stock,
-period="3mo",
-progress=False,
-auto_adjust=True
-)
-
-        if len(df) < 30:
-            continue
-
-        close = df["Close"].squeeze()
-        volume = df["Volume"].squeeze()
-
-        rsi = RSIIndicator(close).rsi().iloc[-1]
-        price = float(close.iloc[-1])
-
-        ma20 = close.rolling(20).mean().iloc[-1]
-        ma50 = close.rolling(50).mean().iloc[-1]
-
-        if price > ma20 > ma50:
-            await send_message(
-                f"📈 TREND ALERT\n{stock}\nStrong Uptrend"
+    for stock in WATCHLIST:
+        try:
+            df = yf.download(
+                stock,
+                period="3mo",
+                progress=False,
+                auto_adjust=True
             )
 
-        avg_volume = volume.tail(20).mean()
-        today_volume = volume.iloc[-1]
+            if len(df) < 30:
+                continue
 
-        if today_volume > avg_volume * 2:
-            await send_message(
-                f"🚀 VOLUME BREAKOUT\n{stock}\nVolume {today_volume / avg_volume:.1f}x Average"
-            )
+            close = df["Close"].squeeze()
+            volume = df["Volume"].squeeze()
 
-        if rsi < 30:
-            await send_message(
-                f"🟢 BUY WATCH\n{stock}\nPrice: ₹{price:.2f}\nRSI: {rsi:.1f}"
-            )
+            rsi = RSIIndicator(close).rsi().iloc[-1]
+            price = float(close.iloc[-1])
 
-        elif rsi > 70:
-            await send_message(
-                f"🔴 PROFIT BOOKING WATCH\n{stock}\nPrice: ₹{price:.2f}\nRSI: {rsi:.1f}"
-            )
+            ma20 = close.rolling(20).mean().iloc[-1]
+            ma50 = close.rolling(50).mean().iloc[-1]
 
-    except Exception as e:
-        print(stock, e)
+            if price > ma20 > ma50:
+                await send_message(
+                    f"📈 TREND ALERT\n{stock}\nStrong Uptrend"
+                )
+
+            avg_volume = volume.tail(20).mean()
+            today_volume = volume.iloc[-1]
+
+            if today_volume > avg_volume * 2:
+                await send_message(
+                    f"🚀 VOLUME BREAKOUT\n{stock}\nVolume {today_volume / avg_volume:.1f}x Average"
+                )
+
+            if rsi < 30:
+                await send_message(
+                    f"🟢 BUY WATCH\n{stock}\nPrice: ₹{price:.2f}\nRSI: {rsi:.1f}"
+                )
+
+            elif rsi > 70:
+                await send_message(
+                    f"🔴 PROFIT BOOKING WATCH\n{stock}\nPrice: ₹{price:.2f}\nRSI: {rsi:.1f}"
+                )
+
+        except Exception as e:
+            print(stock, e)
+
 
 async def main():
-await send_message(
-"✅ Stock bot started successfully"
-)
+    await send_message("✅ Stock bot started successfully")
 
-while True:
-    try:
-        if market_open():
-            await scan()
+    while True:
+        try:
+            if market_open():
+                await scan()
 
-        await asyncio.sleep(900)
+            await asyncio.sleep(900)
 
-    except Exception as e:
-        print(e)
-        await asyncio.sleep(60)
+        except Exception as e:
+            print(e)
+            await asyncio.sleep(60)
+
 
 asyncio.run(main())
