@@ -22,6 +22,7 @@ WATCHLIST = [
 "EQUITASBNK.NS"
 ]
 
+
 def market_open():
 now = datetime.now()
 
