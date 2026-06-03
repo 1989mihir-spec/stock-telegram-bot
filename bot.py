@@ -24,10 +24,10 @@ WATCHLIST = [
 ]
 
 def market_open():
-now = datetime.now()
+    now = datetime.now()
 
-if now.weekday() > 4:
-    return False
+    if now.weekday() > 4:
+        return False
 
 current = now.hour * 60 + now.minute
 return 555 <= current <= 930
