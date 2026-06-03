@@ -51,6 +51,22 @@ async def scan():
 
             rsi = RSIIndicator(close).rsi().iloc[-1]
             price = float(close.iloc[-1])
+ma20 = close.rolling(20).mean().iloc[-1]
+ma50 = close.rolling(50).mean().iloc[-1]
+
+if price > ma20 > ma50:
+    await send_message(
+        f"📈 TREND ALERT\n{stock}\nStrong Uptrend"
+    )
+volume = df["Volume"].squeeze()
+
+avg_volume = volume.tail(20).mean()
+today_volume = volume.iloc[-1]
+
+if today_volume > avg_volume * 2:
+    await send_message(
+        f"🚀 VOLUME BREAKOUT\n{stock}\nVolume {today_volume/avg_volume:.1f}x Average"
+    )
 
             if rsi < 30:
                 await send_message(
